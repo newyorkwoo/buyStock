@@ -41,12 +41,51 @@ def print_banner():
 
 
 def download_data(save: bool = True):
-    """下載最新資料"""
-    print("\n📥 下載那斯達克指數與 VIX 歷史資料...")
+    """下載最新的完整歷史資料 (從 2000 年至今)"""
+    import yfinance as yf
+    from datetime import timedelta
+    import pytz
+    
+    print("\n📥 下載那斯達克指數與 VIX 完整歷史資料 (2000-至今)...")
     print("-" * 50)
     
-    fetcher = DataFetcher()
-    nasdaq_data, vix_data = fetcher.fetch_all(save_csv=save)
+    # 取得專案根目錄
+    project_root = Path(__file__).parent
+    data_dir = project_root / "data" / "raw"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    
+    nasdaq_2000_file = data_dir / "nasdaq_2000.csv"
+    vix_2000_file = data_dir / "vix_2000.csv"
+    nasdaq_historical_file = data_dir / "nasdaq_historical.csv"
+    vix_historical_file = data_dir / "vix_historical.csv"
+    
+    # 使用台灣時區
+    tw_tz = pytz.timezone('Asia/Taipei')
+    tw_now = datetime.now(tw_tz)
+    today = tw_now.strftime("%Y-%m-%d")
+    end_date = (tw_now + timedelta(days=1)).strftime("%Y-%m-%d")
+    start_date = "2000-01-01"
+    
+    print(f"   📥 下載 NASDAQ 指數 ({start_date} ~ {today})...")
+    nasdaq_data = yf.download("^IXIC", start=start_date, end=end_date, progress=False)
+    
+    if save:
+        nasdaq_data.to_csv(nasdaq_2000_file)
+        nasdaq_data.to_csv(nasdaq_historical_file)  # 同時更新歷史檔案
+        print(f"   ✅ NASDAQ 資料: {len(nasdaq_data)} 筆")
+        print(f"      已儲存至: {nasdaq_2000_file.name}")
+    
+    print(f"   📥 下載 VIX 指數...")
+    vix_data = yf.download("^VIX", start=start_date, end=end_date, progress=False)
+    
+    if save:
+        vix_data.to_csv(vix_2000_file)
+        vix_data.to_csv(vix_historical_file)  # 同時更新歷史檔案
+        print(f"   ✅ VIX 資料: {len(vix_data)} 筆")
+        print(f"      已儲存至: {vix_2000_file.name}")
+    
+    print(f"   📅 資料範圍: {nasdaq_data.index[0].strftime('%Y-%m-%d')} ~ {nasdaq_data.index[-1].strftime('%Y-%m-%d')}")
+    print("   ✅ 資料下載完成！")
     
     return nasdaq_data, vix_data
 
@@ -93,48 +132,38 @@ def run_backtest(start_date="2015-01-01", end_date=None):
 def generate_interactive_report():
     """產生互動式 HTML 報告 (可捲動、縮放) - 2000年至今"""
     import webbrowser
-    import yfinance as yf
-    from datetime import timedelta
     import pytz
     
     print("\n📊 產生互動式 HTML 報告 (2000年至今)...")
     print("-" * 50)
-    print("   🔄 強制更新至最新市場資料...")
     
-    # 檢查是否有 2000 年的歷史資料
+    # 讀取已下載的歷史資料
     project_root = Path(__file__).parent
     data_dir = project_root / "data" / "raw"
     nasdaq_2000_file = data_dir / "nasdaq_2000.csv"
     vix_2000_file = data_dir / "vix_2000.csv"
-    data_dir.mkdir(parents=True, exist_ok=True)
     
-    # 使用台灣時區
-    tw_tz = pytz.timezone('Asia/Taipei')
-    tw_now = datetime.now(tw_tz)
-    today = tw_now.strftime("%Y-%m-%d")
-    end_date = (tw_now + timedelta(days=1)).strftime("%Y-%m-%d")  # 加一天緩衝
+    # 讀取 CSV 檔案
+    print("   📂 讀取歷史資料...")
+    nasdaq_data = pd.read_csv(nasdaq_2000_file, index_col=0, parse_dates=True, header=[0, 1])
+    vix_data = pd.read_csv(vix_2000_file, index_col=0, parse_dates=True, header=[0, 1])
     
-    # 總是下載最新資料
-    start_date = "2000-01-01"
-    
-    print(f"   📥 下載 NASDAQ 指數 ({start_date} ~ {today})...")
-    nasdaq_data = yf.download("^IXIC", start=start_date, end=end_date, progress=False)
-    nasdaq_data.to_csv(nasdaq_2000_file)
-    
-    print(f"   📥 下載 VIX 指數...")
-    vix_data = yf.download("^VIX", start=start_date, end=end_date, progress=False)
-    vix_data.to_csv(vix_2000_file)
-    
-    # 扁平化 columns
+    # 扁平化 MultiIndex columns
     if isinstance(nasdaq_data.columns, pd.MultiIndex):
         nasdaq_data.columns = nasdaq_data.columns.get_level_values(0)
     if isinstance(vix_data.columns, pd.MultiIndex):
         vix_data.columns = vix_data.columns.get_level_values(0)
     
-    # 顯示更新資訊
+    # 確保 index 是 datetime 類型
+    if not isinstance(nasdaq_data.index, pd.DatetimeIndex):
+        nasdaq_data.index = pd.to_datetime(nasdaq_data.index)
+    if not isinstance(vix_data.index, pd.DatetimeIndex):
+        vix_data.index = pd.to_datetime(vix_data.index)
+    
+    # 顯示資料資訊
     us_et = pytz.timezone('US/Eastern')
     us_now = datetime.now(us_et)
-    print(f"   ✅ 更新完成: {nasdaq_data.index[0].strftime('%Y-%m-%d')} ~ {nasdaq_data.index[-1].strftime('%Y-%m-%d')}")
+    print(f"   ✅ 資料範圍: {nasdaq_data.index[0].strftime('%Y-%m-%d')} ~ {nasdaq_data.index[-1].strftime('%Y-%m-%d')}")
     print(f"   🕒 美東時間: {us_now.strftime('%Y-%m-%d %H:%M %Z')} (美股交易時間 09:30-16:00)")
     print(f"   📊 共 {len(nasdaq_data)} 筆資料")
     
@@ -229,29 +258,19 @@ def analyze_swing_history():
     # 取得專案根目錄
     project_root = Path(__file__).parent
     data_dir = project_root / "data" / "raw"
-    data_dir.mkdir(parents=True, exist_ok=True)
     
     nasdaq_file = data_dir / "nasdaq_2000.csv"
     vix_file = data_dir / "vix_2000.csv"
     
-    # 檢查資料檔案是否存在
+    # 確認資料檔案存在
     if not nasdaq_file.exists() or not vix_file.exists():
-        print("\n⚠️ 歷史資料檔案不存在，正在下載...")
-        import yfinance as yf
-        from datetime import datetime
-        
-        start_date = "2000-01-01"
-        end_date = datetime.now().strftime("%Y-%m-%d")
-        
-        print(f"   📥 下載 NASDAQ 指數 ({start_date} ~ {end_date})...")
-        nasdaq = yf.download("^IXIC", start=start_date, end=end_date)
-        nasdaq.to_csv(nasdaq_file)
-        print(f"   ✅ NASDAQ 資料: {len(nasdaq)} 筆")
-        
-        print(f"   📥 下載 VIX 指數...")
-        vix = yf.download("^VIX", start=start_date, end=end_date)
-        vix.to_csv(vix_file)
-        print(f"   ✅ VIX 資料: {len(vix)} 筆")
+        print("\n❌ 錯誤: 歷史資料檔案不存在")
+        print("   請先執行 python main.py --download 下載資料")
+        return
+    
+    print(f"   📂 使用已下載的歷史資料")
+    print(f"   • NASDAQ: {nasdaq_file.name}")
+    print(f"   • VIX: {vix_file.name}")
     
     # 執行波段分析
     analyzer = SwingAnalyzer()
@@ -334,10 +353,21 @@ def main():
     print_banner()
     
     try:
+        # 判斷是否需要下載最新資料
+        needs_data = not args.status  # 除了查看狀態外，其他操作都需要最新資料
+        
+        if needs_data:
+            # ⭐️ 重要：先下載最新的歷史指數資訊
+            print("\n🔄 自動更新最新市場資料...")
+            print("=" * 60)
+            download_data(save=True)
+            print("=" * 60)
+        
         if args.status:
             show_status()
         elif args.download:
-            download_data()
+            # 已經在上面下載過了，這裡只顯示確認訊息
+            print("\n✅ 資料下載完成！")
         elif args.backtest:
             run_backtest(start_date=args.start, end_date=args.end)
         elif args.report:
