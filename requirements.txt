@@ -22,7 +22,7 @@ APScheduler>=3.10.0
 # Visualization
 matplotlib>=3.7.0
 plotly>=5.18.0
-mplfinance>=0.12.10
+mplfinance>=0.12.10b0
 
 # Utilities
 python-dotenv>=1.0.0
