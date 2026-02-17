@@ -6,7 +6,6 @@ pytz>=2023.3
 
 # Technical Indicators
 ta>=0.10.2
-pandas-ta>=0.3.14b
 
 # Notifications
 line-bot-sdk>=3.0.0
