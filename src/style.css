@@ -105,6 +105,58 @@ label {
   font-weight: 700;
 }
 
+.config-note {
+  color: #94a3b8;
+  font-size: 13px;
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid #334155;
+}
+
+/* Position-specific advice */
+.position-advice {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+@media (min-width: 768px) {
+  .position-advice {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.advice-card {
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #0f172a;
+  border: 2px solid #334155;
+}
+
+.advice-card h3 {
+  font-size: 14px;
+  margin: 0 0 6px;
+}
+
+.advice-card p {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.advice-card.strong-buy { border-color: #22c55e; background: rgba(34, 197, 94, 0.08); }
+.advice-card.buy { border-color: #16a34a; background: rgba(22, 163, 74, 0.08); }
+.advice-card.hold { border-color: #eab308; background: rgba(234, 179, 8, 0.08); }
+.advice-card.sell { border-color: #f97316; background: rgba(249, 115, 22, 0.08); }
+.advice-card.strong-sell { border-color: #ef4444; background: rgba(239, 68, 68, 0.08); }
+
+.tag-strong-buy, .tag-buy { color: #22c55e; }
+.tag-hold { color: #eab308; }
+.tag-sell { color: #f97316; }
+.tag-strong-sell { color: #ef4444; }
+
 .error {
   border-color: #ef4444;
   color: #fecaca;

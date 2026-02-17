@@ -176,15 +176,36 @@ onMounted(() => {
         日期：{{ signalResult.date }} ｜ NASDAQ：{{ signalResult.nasdaqPrice.toFixed(2) }}
         ({{ signalResult.nasdaqChange.toFixed(2) }}%) ｜ VIX：{{ signalResult.vixValue.toFixed(2) }}
       </p>
+      <p v-if="signalResult.positionAdvice">
+        距離波段高點：{{ signalResult.positionAdvice.drawdown.pct }}%
+        （高點 {{ signalResult.positionAdvice.drawdown.peakPrice.toLocaleString() }}）
+      </p>
       <p>綜合分數：{{ signalResult.totalScore.toFixed(2) }} ｜ 信心度：{{ signalResult.confidence.toFixed(1) }}%</p>
+
+      <p class="config-note" v-if="signalResult.config">
+        📊 依據歷史統計：RSI 超賣={{ signalResult.config.rsi.oversold }} / 超買={{ signalResult.config.rsi.overbought }}
+        ｜ VIX 恐慌={{ signalResult.config.vix.fear }} / 高恐慌={{ signalResult.config.vix.highFear }} / 極端={{ signalResult.config.vix.extremeFear }}
+      </p>
+
+      <!-- Position-specific advice -->
+      <div v-if="signalResult.positionAdvice" class="position-advice">
+        <div :class="['advice-card', signalResult.positionAdvice.noPosition.color]">
+          <h3>🆕 未持倉建議：<span :class="'tag-' + signalResult.positionAdvice.noPosition.color">{{ signalResult.positionAdvice.noPosition.signal }}</span></h3>
+          <p>{{ signalResult.positionAdvice.noPosition.advice }}</p>
+        </div>
+        <div :class="['advice-card', signalResult.positionAdvice.hasPosition.color]">
+          <h3>💼 有持倉建議：<span :class="'tag-' + signalResult.positionAdvice.hasPosition.color">{{ signalResult.positionAdvice.hasPosition.signal }}</span></h3>
+          <p>{{ signalResult.positionAdvice.hasPosition.advice }}</p>
+        </div>
+      </div>
 
       <div class="scores">
         <div>
-          <strong>RSI</strong>
+          <strong>RSI ({{ config.rsi.period }})</strong>
           <p>{{ signalResult.scores.rsi.description }}</p>
         </div>
         <div>
-          <strong>MA</strong>
+          <strong>MA{{ config.ma.shortPeriod }}/{{ config.ma.longPeriod }}</strong>
           <p>{{ signalResult.scores.ma.description }}</p>
         </div>
         <div>

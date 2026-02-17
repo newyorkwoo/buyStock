@@ -82,3 +82,12 @@ export function vixRawScore(vixValue, thresholds) {
   if (vixValue < thresholds.extremeFear) return 3
   return 4
 }
+
+export function vixLevelDescription(vixValue, thresholds) {
+  if (vixValue < 12) return `VIX=${vixValue.toFixed(2)} ＜ 12 極低恐慌，市場過度樂觀，注意風險`
+  if (vixValue < thresholds.normal) return `VIX=${vixValue.toFixed(2)} ＜ 正常線${thresholds.normal}，市場平靜`
+  if (vixValue < thresholds.fear) return `VIX=${vixValue.toFixed(2)}，正常${thresholds.normal}~恐慌${thresholds.fear}之間，略有恐慌`
+  if (vixValue < thresholds.highFear) return `VIX=${vixValue.toFixed(2)} ≥ 恐慌線${thresholds.fear}（波谷P25），恐慌升溫，可留意買點`
+  if (vixValue < thresholds.extremeFear) return `VIX=${vixValue.toFixed(2)} ≥ 高恐慌線${thresholds.highFear}（波谷中位數），買入機會浮現`
+  return `VIX=${vixValue.toFixed(2)} ≥ 極端恐慌線${thresholds.extremeFear}（波谷P75），歷史級買入機會`
+}
