@@ -106,20 +106,32 @@ async function runAnalysis() {
       ? `✅ 即時資料已更新（至 ${lastDate}）`
       : `📁 使用本地資料（至 ${lastDate}）`
 
-    const result = generateSignal(nRows, vRows, config.value)
-    signalResult.value = result
-
-    // Run swing statistics
+    // Run swing statistics first to get recommended parameters
     try {
       swingAnalysis.value = analyzeSwingStatistics(nRows, vRows, {
-        rsiPeriod: config.value.rsi.period || 14,
+        rsiPeriod: config.value.rsi.period || 60,
         maShort: config.value.ma.shortPeriod,
         maLong: config.value.ma.longPeriod,
         drawdownThreshold: 0.10
       })
+
+      // Auto-apply historical statistics recommendation to config
+      const rec = swingAnalysis.value.recommendation
+      if (rec) {
+        config.value.rsi.oversold = rec.rsi.oversold
+        config.value.rsi.overbought = rec.rsi.overbought
+        config.value.vix.normal = rec.vix.normal
+        config.value.vix.fear = rec.vix.fear
+        config.value.vix.highFear = rec.vix.highFear
+        config.value.vix.extremeFear = rec.vix.extremeFear
+      }
     } catch (e) {
       console.warn('波段統計分析失敗:', e.message)
     }
+
+    // Generate signal using stats-recommended parameters
+    const result = generateSignal(nRows, vRows, config.value)
+    signalResult.value = result
 
     saveConfig()
   } catch (error) {
@@ -190,7 +202,12 @@ onMounted(() => {
       :vix-rows="vixRows"
       :ma-short="config.ma.shortPeriod"
       :ma-long="config.ma.longPeriod"
-      :rsi-period="config.rsi.period || 14"
+      :rsi-period="config.rsi.period || 60"
+      :rsi-oversold="config.rsi.oversold"
+      :rsi-overbought="config.rsi.overbought"
+      :vix-fear="config.vix.fear"
+      :vix-high-fear="config.vix.highFear"
+      :vix-extreme-fear="config.vix.extremeFear"
     />
 
     <!-- Swing Statistics Section -->

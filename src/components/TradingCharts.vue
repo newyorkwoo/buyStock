@@ -1,15 +1,20 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
-import { createChart, CrosshairMode, CandlestickSeries, LineSeries, AreaSeries, HistogramSeries, createSeriesMarkers } from 'lightweight-charts'
+import { createChart, CrosshairMode, CandlestickSeries, LineSeries, AreaSeries, createSeriesMarkers } from 'lightweight-charts'
 import { rsi as calcRsi, sma as calcSma } from '../lib/indicators'
-import { findSwingCycles, buildDrawdownBackground, buildSwingMarkers } from '../lib/swingDetector'
+import { findSwingCycles, buildDrawdownAreaData, buildSwingMarkers } from '../lib/swingDetector'
 
 const props = defineProps({
   nasdaqRows: { type: Array, required: true },
   vixRows: { type: Array, required: true },
   maShort: { type: Number, default: 60 },
   maLong: { type: Number, default: 200 },
-  rsiPeriod: { type: Number, default: 14 }
+  rsiPeriod: { type: Number, default: 60 },
+  rsiOversold: { type: Number, default: 30 },
+  rsiOverbought: { type: Number, default: 70 },
+  vixFear: { type: Number, default: 20 },
+  vixHighFear: { type: Number, default: 28 },
+  vixExtremeFear: { type: Number, default: 41 }
 })
 
 const klineRef = ref(null)
@@ -108,25 +113,29 @@ function buildCharts() {
       .filter(Boolean)
   )
 
-  // ============ Drawdown zones (>15%) ============
+  // ============ Drawdown zones (≥10%) ============
   const cycles = findSwingCycles(nasdaq, 0.10)
 
   if (cycles.length) {
-    // Background shading via histogram on hidden scale
-    const bgSeries = klineChart.addSeries(HistogramSeries, {
+    // Background shading via area on hidden scale
+    const bgSeries = klineChart.addSeries(AreaSeries, {
       priceScaleId: 'drawdown_bg',
       lastValueVisible: false,
       priceLineVisible: false,
-      color: 'rgba(239, 68, 68, 0.13)'
+      crosshairMarkerVisible: false,
+      lineVisible: false,
+      topColor: 'rgba(239, 68, 68, 0.25)',
+      bottomColor: 'rgba(239, 68, 68, 0.25)',
+      lineColor: 'transparent'
     })
     klineChart.priceScale('drawdown_bg').applyOptions({
       visible: false,
       scaleMargins: { top: 0, bottom: 0 }
     })
-    bgSeries.setData(buildDrawdownBackground(nasdaq, cycles))
+    bgSeries.setData(buildDrawdownAreaData(nasdaq, cycles))
 
     // Peak / trough markers on candle series
-    const markersPrimitive = createSeriesMarkers(candleSeries, buildSwingMarkers(cycles))
+    createSeriesMarkers(candleSeries, buildSwingMarkers(cycles, nasdaq))
   }
 
   klineChart.timeScale().setVisibleRange({ from: fromStr, to: toStr })
@@ -169,9 +178,28 @@ function buildCharts() {
     ])
   }
 
-  addVixLevel(20, '#94a3b8', '')
-  addVixLevel(30, '#f59e0b', 'Fear')
-  addVixLevel(40, '#ef4444', 'Extreme')
+  addVixLevel(props.vixFear, '#94a3b8', `Fear(${props.vixFear})`)
+  addVixLevel(props.vixHighFear, '#f59e0b', `High Fear(${props.vixHighFear})`)
+  addVixLevel(props.vixExtremeFear, '#ef4444', `Extreme(${props.vixExtremeFear})`)
+
+  // VIX drawdown zones
+  if (cycles.length) {
+    const vixBg = vixChart.addSeries(AreaSeries, {
+      priceScaleId: 'vix_dd_bg',
+      lastValueVisible: false,
+      priceLineVisible: false,
+      crosshairMarkerVisible: false,
+      lineVisible: false,
+      topColor: 'rgba(239, 68, 68, 0.28)',
+      bottomColor: 'rgba(239, 68, 68, 0.28)',
+      lineColor: 'transparent'
+    })
+    vixChart.priceScale('vix_dd_bg').applyOptions({
+      visible: false,
+      scaleMargins: { top: 0, bottom: 0 }
+    })
+    vixBg.setData(buildDrawdownAreaData(nasdaq, cycles))
+  }
 
   vixChart.timeScale().setVisibleRange({ from: fromStr, to: toStr })
 
@@ -216,8 +244,27 @@ function buildCharts() {
     ])
   }
 
-  addRsiLevel(30, '#22c55e', 'Oversold')
-  addRsiLevel(70, '#ef4444', 'Overbought')
+  addRsiLevel(props.rsiOversold, '#22c55e', `Oversold(${props.rsiOversold})`)
+  addRsiLevel(props.rsiOverbought, '#ef4444', `Overbought(${props.rsiOverbought})`)
+
+  // RSI drawdown zones
+  if (cycles.length) {
+    const rsiBg = rsiChart.addSeries(AreaSeries, {
+      priceScaleId: 'rsi_dd_bg',
+      lastValueVisible: false,
+      priceLineVisible: false,
+      crosshairMarkerVisible: false,
+      lineVisible: false,
+      topColor: 'rgba(239, 68, 68, 0.28)',
+      bottomColor: 'rgba(239, 68, 68, 0.28)',
+      lineColor: 'transparent'
+    })
+    rsiChart.priceScale('rsi_dd_bg').applyOptions({
+      visible: false,
+      scaleMargins: { top: 0, bottom: 0 }
+    })
+    rsiBg.setData(buildDrawdownAreaData(nasdaq, cycles))
+  }
 
   rsiChart.timeScale().setVisibleRange({ from: fromStr, to: toStr })
 
@@ -276,7 +323,7 @@ function destroyCharts() {
 }
 
 watch(
-  () => [props.nasdaqRows, props.vixRows, props.maShort, props.maLong, props.rsiPeriod],
+  () => [props.nasdaqRows, props.vixRows, props.maShort, props.maLong, props.rsiPeriod, props.rsiOversold, props.rsiOverbought, props.vixFear, props.vixHighFear, props.vixExtremeFear],
   () => {
     if (props.nasdaqRows.length && props.vixRows.length) {
       buildCharts()

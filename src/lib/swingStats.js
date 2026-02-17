@@ -39,7 +39,7 @@ function stats(arr) {
  * @param {{ date: string, close: number }[]} nasdaqRows
  * @param {{ date: string, close: number }[]} vixRows
  * @param {object} [params]
- * @param {number} [params.rsiPeriod=14]
+ * @param {number} [params.rsiPeriod=60]
  * @param {number} [params.maShort=60]
  * @param {number} [params.maLong=200]
  * @param {number} [params.drawdownThreshold=0.10]
@@ -47,7 +47,7 @@ function stats(arr) {
  */
 export function analyzeSwingStatistics(nasdaqRows, vixRows, params = {}) {
   const {
-    rsiPeriod = 14,
+    rsiPeriod = 60,
     maShort = 60,
     maLong = 200,
     drawdownThreshold = 0.10

@@ -53,6 +53,16 @@ export function findSwingCycles(rows, threshold = 0.15) {
       }
     }
 
+    // Find the first bar where drawdown crosses the threshold
+    let thresholdCrossIdx = drawdownStartIdx
+    for (let j = drawdownStartIdx; j <= cycleTroughIdx; j++) {
+      const dd = (rows[j].close - peakVal) / peakVal
+      if (dd <= -threshold) {
+        thresholdCrossIdx = j
+        break
+      }
+    }
+
     cycles.push({
       peakIdx: drawdownStartIdx,
       peakDate: rows[drawdownStartIdx].date,
@@ -63,7 +73,8 @@ export function findSwingCycles(rows, threshold = 0.15) {
       recoveryIdx,
       recoveryDate: recoveryIdx != null ? rows[recoveryIdx].date : null,
       recoveryPrice: recoveryIdx != null ? rows[recoveryIdx].close : null,
-      drawdown: maxDd
+      drawdown: maxDd,
+      thresholdCrossIdx
     })
   }
 
@@ -123,12 +134,13 @@ export function findSwingCycles(rows, threshold = 0.15) {
  * @returns {{ time: string, value: number, color: string }[]}
  */
 export function buildDrawdownBackground(rows, cycles) {
-  // Build a set of indices that are inside drawdown zones
+  // Build a set of indices that are inside drawdown zones (peak to trough)
   const inZone = new Uint8Array(rows.length)
 
   for (const c of cycles) {
+    const startIdx = c.peakIdx
     const endIdx = c.troughIdx
-    for (let i = c.peakIdx; i <= endIdx; i++) {
+    for (let i = startIdx; i <= endIdx; i++) {
       inZone[i] = 1
     }
   }
@@ -136,17 +148,44 @@ export function buildDrawdownBackground(rows, cycles) {
   return rows.map((r, i) => ({
     time: r.date.slice(0, 10),
     value: inZone[i] ? 100 : 0,
-    color: inZone[i] ? 'rgba(239, 68, 68, 0.13)' : 'transparent'
+    color: inZone[i] ? 'rgba(239, 68, 68, 0.25)' : 'transparent'
   }))
 }
 
 /**
- * Build lightweight-charts markers for peaks and troughs.
+ * Build per-bar AreaSeries data for drawdown zone shading.
+ * Each zone is isolated: bars outside zones get value=0,
+ * bars inside zones get value=topValue.
+ * A zero-value bar is inserted at zone boundaries to create clean vertical edges.
+ *
+ * @param {{ date: string }[]} rows
+ * @param {SwingCycle[]} cycles
+ * @param {number} [topValue=1e9]
+ * @returns {{ time: string, value: number }[]}
+ */
+export function buildDrawdownAreaData(rows, cycles, topValue = 1e9) {
+  const inZone = new Uint8Array(rows.length)
+  for (const c of cycles) {
+    for (let i = c.peakIdx; i <= c.troughIdx; i++) {
+      inZone[i] = 1
+    }
+  }
+
+  return rows.map((r, i) => ({
+    time: r.date.slice(0, 10),
+    value: inZone[i] ? topValue : 0
+  }))
+}
+
+/**
+ * Build lightweight-charts markers for peaks, troughs, and drawdown milestones.
+ * Milestones are placed at -10%, then every additional -5% (-15%, -20%, …).
  *
  * @param {SwingCycle[]} cycles
+ * @param {{ date: string, close: number }[]} rows – full price rows for milestone calculation
  * @returns {import('lightweight-charts').SeriesMarker[]}
  */
-export function buildSwingMarkers(cycles) {
+export function buildSwingMarkers(cycles, rows) {
   const markers = []
 
   for (const c of cycles) {
@@ -167,6 +206,27 @@ export function buildSwingMarkers(cycles) {
       shape: 'arrowUp',
       text: `${pct}%`
     })
+
+    // Drawdown milestone markers: -10%, -15%, -20%, …
+    if (rows) {
+      const peakPrice = c.peakPrice
+      let nextThreshold = -0.10 // start at -10%
+      const step = -0.05          // every additional -5%
+
+      for (let i = c.peakIdx; i <= c.troughIdx; i++) {
+        const dd = (rows[i].close - peakPrice) / peakPrice
+        if (dd <= nextThreshold) {
+          markers.push({
+            time: rows[i].date.slice(0, 10),
+            position: 'belowBar',
+            color: '#f59e0b',
+            shape: 'circle',
+            text: `${(nextThreshold * 100).toFixed(0)}%`
+          })
+          nextThreshold += step
+        }
+      }
+    }
   }
 
   // Must be sorted by time for lightweight-charts
