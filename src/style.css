@@ -1,0 +1,330 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #e2e8f0;
+  background: #1e293b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #1e293b;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+h1,
+h2,
+p {
+  margin: 0 0 8px;
+}
+
+.controls {
+  display: grid;
+  gap: 10px;
+}
+
+button,
+input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #475569;
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 10px;
+  font-size: 14px;
+}
+
+button {
+  background: #0369a1;
+  border: none;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.scores {
+  display: grid;
+  gap: 8px;
+}
+
+.signal {
+  border-width: 2px;
+}
+
+.strong-buy {
+  border-color: #22c55e;
+}
+
+.buy {
+  border-color: #16a34a;
+}
+
+.hold {
+  border-color: #eab308;
+}
+
+.sell {
+  border-color: #f97316;
+}
+
+.strong-sell {
+  border-color: #ef4444;
+}
+
+.buy-tag {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.error {
+  border-color: #ef4444;
+  color: #fecaca;
+}
+
+.info {
+  border-color: #38bdf8;
+  color: #bae6fd;
+}
+
+.data-status {
+  border-color: #475569;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+}
+
+/* -------- Charts -------- */
+.chart-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.chart-panel {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px;
+  overflow: visible;
+}
+
+.chart-panel h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.chart-box {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .controls {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: end;
+  }
+
+  .controls label {
+    grid-column: span 3;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .scores {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* -------- Swing Statistics -------- */
+.swing-stats h2 {
+  margin: 0 0 4px;
+}
+
+.swing-subtitle {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin: 0 0 14px;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.stat-block {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.stat-block h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.stat-block table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.stat-block th,
+.stat-block td {
+  text-align: right;
+  padding: 3px 6px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.stat-block th {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.stat-block td:first-child,
+.stat-block th:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+
+.recommendation {
+  background: #0f172a;
+  border: 1px solid #38bdf8;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.recommendation h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.rec-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+}
+
+.rec-params strong {
+  color: #38bdf8;
+}
+
+.rec-reasoning {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.rec-reasoning li {
+  padding: 2px 0;
+}
+
+.rec-reasoning li::before {
+  content: '• ';
+  color: #475569;
+}
+
+.btn-apply {
+  background: #38bdf8;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-apply:hover {
+  background: #7dd3fc;
+}
+
+.cycle-details {
+  margin-top: 4px;
+}
+
+.cycle-details summary {
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  padding: 6px 0;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.table-scroll th,
+.table-scroll td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #1e293b;
+  text-align: right;
+}
+
+.table-scroll th {
+  color: #64748b;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  background: #1e293b;
+}
+
+.table-scroll td:first-child,
+.table-scroll th:first-child {
+  text-align: left;
+}
+
+.table-scroll .dd {
+  color: #ef4444;
+  font-weight: 600;
+}
