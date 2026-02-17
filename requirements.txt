@@ -8,9 +8,6 @@ pytz>=2023.3
 ta>=0.10.2
 pandas-ta>=0.3.14b
 
-# Backtesting
-vectorbt>=0.26.0
-
 # Notifications
 line-bot-sdk>=3.0.0
 yagmail>=0.15.0
