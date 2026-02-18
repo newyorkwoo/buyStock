@@ -25,7 +25,7 @@ class RSIThresholds:
     """RSI 相對強弱指標閾值設定"""
     oversold: float = 30.0      # < 30: 超賣 (買入信號)
     overbought: float = 70.0    # > 70: 超買 (賣出信號)
-    period: int = 14            # RSI 計算週期
+    period: int = 60            # RSI 計算週期
 
 
 @dataclass

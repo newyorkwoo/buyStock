@@ -38,7 +38,7 @@ export function ema(values, period) {
   return result
 }
 
-export function rsi(values, period = 14) {
+export function rsi(values, period = 60) {
   const result = Array(values.length).fill(null)
   if (values.length <= period) return result
 

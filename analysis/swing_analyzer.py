@@ -631,10 +631,10 @@ class SwingAnalyzer:
         # 計算技術指標
         df = df.copy()
         
-        # RSI (14日)
+        # RSI (60日)
         delta = df['Close'].diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        gain = (delta.where(delta > 0, 0)).rolling(window=60).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=60).mean()
         rs = gain / loss
         df['RSI'] = 100 - (100 / (1 + rs))
         
