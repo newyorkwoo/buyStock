@@ -190,11 +190,11 @@ onMounted(() => {
       <!-- Position-specific advice -->
       <div v-if="signalResult.positionAdvice" class="position-advice">
         <div :class="['advice-card', signalResult.positionAdvice.noPosition.color]">
-          <h3>🆕 未持倉建議：<span :class="'tag-' + signalResult.positionAdvice.noPosition.color">{{ signalResult.positionAdvice.noPosition.signal }}</span></h3>
+          <h3>🆕 未持股票建議：<span :class="'tag-' + signalResult.positionAdvice.noPosition.color">{{ signalResult.positionAdvice.noPosition.signal }}</span></h3>
           <p>{{ signalResult.positionAdvice.noPosition.advice }}</p>
         </div>
         <div :class="['advice-card', signalResult.positionAdvice.hasPosition.color]">
-          <h3>💼 有持倉建議：<span :class="'tag-' + signalResult.positionAdvice.hasPosition.color">{{ signalResult.positionAdvice.hasPosition.signal }}</span></h3>
+          <h3>💼 已持有股票建議：<span :class="'tag-' + signalResult.positionAdvice.hasPosition.color">{{ signalResult.positionAdvice.hasPosition.signal }}</span></h3>
           <p>{{ signalResult.positionAdvice.hasPosition.advice }}</p>
         </div>
       </div>

@@ -146,7 +146,7 @@ function generatePositionAdvice(drawdownInfo, rsiValue, vixValue, maShort, maLon
   const ddPct = (currentDrawdown * 100).toFixed(1)
   const rsiV = rsiValue != null ? rsiValue.toFixed(1) : null
 
-  // ── 未持倉建議 ──
+  // ── 未持股票建議 ──
   let noPositionSignal, noPositionAdvice, noPositionColor
 
   if (currentDrawdown <= -0.20) {
@@ -181,7 +181,7 @@ function generatePositionAdvice(drawdownInfo, rsiValue, vixValue, maShort, maLon
     noPositionColor = 'strong-buy'
   }
 
-  // ── 有持倉建議 ──
+  // ── 已持有股票建議 ──
   let hasPositionSignal, hasPositionAdvice, hasPositionColor
 
   if (currentDrawdown <= -0.20) {
@@ -193,9 +193,9 @@ function generatePositionAdvice(drawdownInfo, rsiValue, vixValue, maShort, maLon
     hasPositionColor = 'hold'
     hasPositionAdvice = `⏸️ 從高點回落 ${ddPct}%，目前不適合加倉。建議持有觀望，等待更明確的底部訊號再考慮加碼。`
   } else if (currentDrawdown <= -0.05) {
-    hasPositionSignal = 'HOLD'
-    hasPositionColor = 'hold'
-    hasPositionAdvice = `⏸️ 從高點小幅回落 ${ddPct}%。持有即可，不建議加倉，也不需急於獲利了結。`
+    hasPositionSignal = 'BUY'
+    hasPositionColor = 'buy'
+    hasPositionAdvice = `📉 從波段高點下跌 ${ddPct}%，已達 5% 門檻。建議買進與指數相關的股票。`
   } else {
     // Near peak
     if (rsiV != null && rsiValue > config.rsi.overbought) {
