@@ -144,19 +144,6 @@ async function runAnalysis() {
 
 
 
-function applyRecommendation() {
-  if (!swingAnalysis.value?.recommendation) return
-  const rec = swingAnalysis.value.recommendation
-  config.value.rsi.oversold = rec.rsi.oversold
-  config.value.rsi.overbought = rec.rsi.overbought
-  config.value.vix.normal = rec.vix.normal
-  config.value.vix.fear = rec.vix.fear
-  config.value.vix.highFear = rec.vix.highFear
-  config.value.vix.extremeFear = rec.vix.extremeFear
-  saveConfig()
-  runAnalysis()
-}
-
 onMounted(() => {
   loadSavedConfig()
   runAnalysis()
@@ -312,7 +299,6 @@ onMounted(() => {
         <ul class="rec-reasoning">
           <li v-for="(reason, idx) in swingAnalysis.recommendation.reasoning" :key="idx">{{ reason }}</li>
         </ul>
-        <button class="btn-apply" @click="applyRecommendation">套用建議參數</button>
       </div>
 
       <!-- Cycle Detail Table -->
@@ -337,7 +323,7 @@ onMounted(() => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(c, i) in swingAnalysis.cycles" :key="i">
+              <tr v-for="(c, i) in [...swingAnalysis.cycles].reverse()" :key="i">
                 <td>{{ c.peakDate }}</td>
                 <td>{{ c.peakPrice.toLocaleString() }}</td>
                 <td>{{ c.troughDate }}</td>
