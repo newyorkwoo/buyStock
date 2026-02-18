@@ -170,7 +170,7 @@ onMounted(() => {
     </header>
 
     <section v-if="signalResult" :class="['card', signalClass]">
-      <h2>最新訊號：{{ signalResult.signal }}</h2>
+      <h2>最新訊號：</h2>
       <p>{{ signalResult.summary }}</p>
       <p>
         日期：{{ signalResult.date }} ｜ NASDAQ：{{ signalResult.nasdaqPrice.toFixed(2) }}

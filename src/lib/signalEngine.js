@@ -37,13 +37,13 @@ function maScore(closeValue, shortValue, longValue, maConfig) {
       return {
         score: 2,
         signal: 'BUY',
-        description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 黃金交叉+站上均線`
+        description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 短線在長線之上（多頭排列）+站上均線`
       }
     }
     return {
       score: 1,
       signal: 'BUY',
-      description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 黃金交叉`
+      description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 短線在長線之上（多頭排列）`
     }
   }
 
@@ -51,13 +51,13 @@ function maScore(closeValue, shortValue, longValue, maConfig) {
     return {
       score: -2,
       signal: 'SELL',
-      description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 死亡交叉+跌破均線`
+      description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 短線在長線之下（空頭排列）+跌破均線`
     }
   }
   return {
     score: -1,
     signal: 'SELL',
-    description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 死亡交叉`
+    description: `SMA${maConfig.shortPeriod}-SMA${maConfig.longPeriod}=${(shortValue - longValue).toFixed(2)} 短線在長線之下（空頭排列）`
   }
 }
 
