@@ -8,7 +8,7 @@ const props = defineProps({
   nasdaqRows: { type: Array, required: true },
   vixRows: { type: Array, required: true },
   maShort: { type: Number, default: 60 },
-  maLong: { type: Number, default: 200 },
+  maLong: { type: Number, default: 250 },
   rsiPeriod: { type: Number, default: 60 },
   rsiOversold: { type: Number, default: 30 },
   rsiOverbought: { type: Number, default: 70 },

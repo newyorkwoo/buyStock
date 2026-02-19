@@ -10,7 +10,7 @@ const SIGNALS = {
 
 export const defaultConfig = {
   rsi: { period: 60, oversold: 43, overbought: 61 },
-  ma: { shortPeriod: 60, longPeriod: 200 },
+  ma: { shortPeriod: 60, longPeriod: 250 },
   vix: { normal: 15, fear: 20, highFear: 28, extremeFear: 41 },
   weights: { rsi: 0.34, ma: 0.33, vix: 0.33 }
 }

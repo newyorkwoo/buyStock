@@ -41,7 +41,7 @@ function stats(arr) {
  * @param {object} [params]
  * @param {number} [params.rsiPeriod=60]
  * @param {number} [params.maShort=60]
- * @param {number} [params.maLong=200]
+ * @param {number} [params.maLong=250]
  * @param {number} [params.drawdownThreshold=0.10]
  * @returns {{ cycles: object[], peakStats: object, troughStats: object, recommendation: object }}
  */
@@ -49,7 +49,7 @@ export function analyzeSwingStatistics(nasdaqRows, vixRows, params = {}) {
   const {
     rsiPeriod = 60,
     maShort = 60,
-    maLong = 200,
+    maLong = 250,
     drawdownThreshold = 0.10
   } = params
 
@@ -212,13 +212,13 @@ function generateRecommendation(peakStats, troughStats) {
   // === MA Recommendation ===
   if (troughStats.maDiffPct) {
     rec.reasoning.push(
-      `MA 交叉 — 波谷時 MA${60}-MA${200} 差值%：中位數 ${troughStats.maDiffPct.median}%，` +
+      `MA 交叉 — 波谷時 MA${maShort}-MA${maLong} 差值%：中位數 ${troughStats.maDiffPct.median}%，` +
       `P25=${troughStats.maDiffPct.p25}%，P75=${troughStats.maDiffPct.p75}%（負值=死叉）`
     )
   }
   if (peakStats.maDiffPct) {
     rec.reasoning.push(
-      `MA 交叉 — 波峰時 MA${60}-MA${200} 差值%：中位數 ${peakStats.maDiffPct.median}%，` +
+      `MA 交叉 — 波峰時 MA${maShort}-MA${maLong} 差值%：中位數 ${peakStats.maDiffPct.median}%，` +
       `P25=${peakStats.maDiffPct.p25}%，P75=${peakStats.maDiffPct.p75}%（正值=黃金交叉）`
     )
   }
