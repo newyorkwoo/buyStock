@@ -8,6 +8,14 @@
 
 const YAHOO_CHART_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart'
 
+/**
+ * Build the Vercel serverless proxy URL (bypasses CORS on production).
+ * Falls back to direct Yahoo / CORS proxies if the serverless function is unavailable.
+ */
+function buildProxyUrl(symbol, range = '25y') {
+  return `/api/yahoo?symbol=${encodeURIComponent(symbol)}&range=${encodeURIComponent(range)}`
+}
+
 const CORS_PROXIES = [
   (url) => url, // try direct first
   (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
@@ -79,9 +87,20 @@ function parseChartResponse(json) {
  * @returns {Promise<{date:string,close:number,open:number|null,high:number|null,low:number|null}[]>}
  */
 async function fetchSymbol(symbol, range = '25y') {
-  const baseUrl = buildYahooUrl(symbol, range)
   let lastError = null
 
+  // Strategy 1: Use our own Vercel serverless proxy (no CORS issues)
+  try {
+    const proxyUrl = buildProxyUrl(symbol, range)
+    const json = await fetchWithTimeout(proxyUrl)
+    return parseChartResponse(json)
+  } catch (err) {
+    console.warn(`Serverless proxy failed for ${symbol}:`, err.message)
+    lastError = err
+  }
+
+  // Strategy 2: Try direct Yahoo + CORS proxies as fallback
+  const baseUrl = buildYahooUrl(symbol, range)
   for (const proxyFn of CORS_PROXIES) {
     try {
       const url = proxyFn(baseUrl)
