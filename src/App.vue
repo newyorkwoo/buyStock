@@ -58,6 +58,9 @@ function loadSavedConfig() {
     if (parsed.config) config.value = parsed.config
     if (parsed.dataSource) dataSource.value = parsed.dataSource
 
+    // 強制使用程式碼中的 MA 週期設定（避免 localStorage 殘留舊值）
+    config.value.ma.shortPeriod = defaultConfig.ma.shortPeriod
+    config.value.ma.longPeriod = defaultConfig.ma.longPeriod
   } catch {
     localStorage.removeItem(storageKey)
   }
