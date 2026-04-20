@@ -181,6 +181,11 @@ onMounted(() => {
         ｜ VIX 恐慌={{ signalResult.config.vix.fear }} / 高恐慌={{ signalResult.config.vix.highFear }} / 極端={{ signalResult.config.vix.extremeFear }}
       </p>
 
+      <p class="swing-low-hint">
+        ⚠️ 那斯達克日K線若破季線或年線、VIX &gt; 28、RSI 接近 40，歷史上附近常是波段低點。<br>
+        一般修正：首次觸發距底部通常僅 5~10%；真熊市：底部附近會多次觸發，需觀察 VIX 是否突破 40 以上、年線是否仍在多頭方向作為分辨依據。
+      </p>
+
       <!-- Position-specific advice -->
       <div v-if="signalResult.positionAdvice" class="position-advice">
         <div :class="['advice-card', signalResult.positionAdvice.noPosition.color]">

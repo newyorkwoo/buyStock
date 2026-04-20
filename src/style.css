@@ -114,6 +114,16 @@ label {
   border: 1px solid #334155;
 }
 
+.swing-low-hint {
+  color: #facc15;
+  font-size: 13px;
+  background: #1a1500;
+  border-radius: 8px;
+  padding: 10px 14px;
+  border: 1px solid #854d0e;
+  line-height: 1.7;
+}
+
 /* Position-specific advice */
 .position-advice {
   display: grid;
